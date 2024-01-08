@@ -24,6 +24,7 @@ nav a:hover {
 /* SearchBar Styles */
 input {
   padding: 5px;
+  position:fixed;
 
 }
 
@@ -36,7 +37,8 @@ button {
 .container {
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  margin:5px;
+
 }
 
 /* LawyerSearch Styles */
@@ -45,7 +47,7 @@ button {
   margin: 10px;
   box-sizing: border-box;
   width: 100%; /* Adjust the width as needed */
-  max-width: 300px;
+ margin:5px;
   max-height: 400px;
   /* overflow-y: auto; */
 }
@@ -61,6 +63,7 @@ button {
 /* Color Styling for LawyerSearch Cards */
 .box {
   background-color: #f8f8f8;
+  width: 275px;
   border: 1px solid #ddd;
   border-radius: 8px;
   overflow: hidden;
@@ -109,4 +112,16 @@ button:hover {
 
 .my-codefor-googlemap {
   color: blue;
+}
+.searchBar
+{
+ margin:5px;
+ height:35px;
+}
+
+/* Add this style to your CSS file */
+.no-lawyers-found {
+  font-size: 1.2em; /* Adjust the font size as needed */
+  font-weight: bold;
+  color: red; /* You can customize the color */
 }

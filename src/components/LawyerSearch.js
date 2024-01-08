@@ -1,105 +1,87 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import axios from "axios";
 
-const LawyerSearch = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+const LawyerSearch = ({ searchQuery, onSearch }) => {
   const [displayedLawyers, setDisplayedLawyers] = useState([]);
+  const [originalLawyers, setOriginalLawyers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Initialize displayedLawyers with the entire list of lawyers when the component is first rendered
-  useEffect(() => {
-    setDisplayedLawyers(product);
-  }, []);
-
-  const handleSearch = (e) => {
-    const searchData = e.target.value.toLowerCase();
-    const filteredData = product.filter(
-      (item) =>
-        item.name.toLowerCase().includes(searchData) ||
-        item.specification.toLowerCase().includes(searchData)
-    );
-    setDisplayedLawyers(filteredData);
+  const fetchData = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/lawyers");
+      setDisplayedLawyers(response.data);
+      setOriginalLawyers(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
-  const product = [
-    {
-      id: 0,
-      name: 'Rishi',
-      specification: 'Criminal Law',
-      location: 'Hyderabad',
-  },
-  {
-      id: 1,
-      name: 'Eshaan',
-      specification: 'Labour Law',
-      location: 'Secundarabad',
-  },
-  {
-      id: 2,
-      name: 'Keshav',
-      specification: 'Cyber Law',
-      location: 'Warangal',
-  },
-  {
-      id: 3,
-      name: 'Srishma',
-      specification: 'Family & Maritial affairs',
-      location: 'Mumbai',
-  },
-  {
-      id: 4,
-      name: 'Sarayu',
-      specification: 'Criminal Law',
-      location: 'Chennai',
-  },
-  {
-      id: 5,
-      name: 'Sindhu',
-      specification: 'Criminal Law',
-      location: 'Bangalore',
-  }
-  ];
+  const handleSearch = (value) => {
+    onSearch(value);
+  };
+
+  const filterLawyers = useCallback(() => {
+    const lowerCaseQuery = searchQuery.toLowerCase();
+
+    const filteredData = originalLawyers.filter(
+      (item) =>
+        item.name.toLowerCase().includes(lowerCaseQuery) ||
+        item.desc.toLowerCase().includes(lowerCaseQuery) ||
+        item.location.toLowerCase().includes(lowerCaseQuery)
+    );
+
+    setDisplayedLawyers(filteredData);
+  }, [searchQuery, originalLawyers]);
+
+  useEffect(() => {
+    filterLawyers();
+  }, [filterLawyers]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <div className="container lawyer-search">
+      <div className="searchBar">
+        <input
+          placeholder="Search..."
+          id="searchBar"
+          name="searchBar"
+          type="text"
+          value={searchQuery}
+          onChange={(e) => handleSearch(e.target.value)}
+        />
+        <i className="fa-solid fa-magnifying-glass glass" id="btn"></i>
+      </div>
       <div className="data">
         <div className="header">
           <p>Search for Lawyers</p>
         </div>
-        <div className="searchBar">
-          <input
-            placeholder="Search..."
-            id="searchBar"
-            name="searchBar"
-            type="text"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              handleSearch(e);
-            }}
-          />
-          <i className="fa-solid fa-magnifying-glass glass" id="btn"></i>
-        </div>
         <div className="body">
           <div id="root">
             <div className="grid-container">
-              {displayedLawyers.slice(0, 4).map((lawyer) => (
-                <div className="boxx" key={lawyer.id}>
-                  <div className="box">
-                    {/* <div className="img-box">
-                      {/* <img
-                        className="images"
-                        // src={lawyer.image}
-                        alt={`Lawyer: ${lawyer.name}`}
-                      /> */}
-                   {/* </div> */}
-                    <div className="bottom">
-                      <p>{lawyer.name}</p>
-                      <h2>{lawyer.specification}</h2>
-                      <h2>{lawyer.location}</h2>
-                      <button>Book Appointment</button>
+              {loading ? (
+                <p>Loading...</p>
+              ) : displayedLawyers.length === 0 ? (
+                <p className="no-lawyers-found">No lawyers found!</p>
+              ) : (
+                displayedLawyers.slice(0, 4).map((lawyer) => (
+                  <div className="boxx" key={lawyer._id}>
+                    <div className="box">
+                      <div className="bottom">
+                        <p className="name" style={{ fontSize: "1.2em" }}>
+                          <strong>{lawyer.name}</strong>
+                        </p>
+                        <h2 className="specialisation" style={{ fontSize: "0.9em" }}>{lawyer.desc}</h2>
+                        <h2 className="location" style={{ fontSize: "0.9em" }}>{lawyer.location}</h2>
+                        <h2 className="number" style={{ fontSize: "0.9em" }}> Contact: {lawyer.number}</h2>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
